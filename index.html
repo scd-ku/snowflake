@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>雪結晶 成長シミュレーター（中谷ダイアグラム風 / 条件切替プログラム：樹枝状保証版）</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#111a33cc; --ink:#e9eeff; --muted:#aab4dd;
+    --btn:#1e2b59; --btn2:#27387a; --accent:#7dd3fc; --line:#2a3a7a55;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:radial-gradient(1000px 600px at 30% 10%, #182b66 0%, var(--bg) 60%);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"M PLUS Rounded 1c",sans-serif;
+  }
+  header{
+    position:sticky;top:0;z-index:5;
+    background:linear-gradient(#0b1020ee,#0b102000);
+    padding:12px 14px 10px;
+    backdrop-filter: blur(6px);
+  }
+  .headerBar{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:42px 1fr 42px;gap:10px;align-items:center}
+  h1{margin:0;font-size:16px;font-weight:800;letter-spacing:.02em;text-align:center;line-height:1.45}
+  .iconBtn{
+    width:40px;height:40px;border-radius:12px;border:1px solid #2a3a7a88;
+    background:#0f1a3ecc;color:var(--ink);display:grid;place-items:center;
+    cursor:pointer;transition:background .15s ease,transform .15s ease;
+  }
+  .iconBtn:hover{background:#1e2b59}
+  .iconBtn:active{transform:translateY(1px)}
+  .iconBtn svg{width:22px;height:22px;stroke:currentColor}
+  dialog.appDialog{
+    width:min(92vw,560px);max-height:86vh;overflow:auto;
+    border:1px solid #38509a;border-radius:16px;padding:0;
+    color:var(--ink);background:#0d1633;box-shadow:0 22px 70px #000a;
+  }
+  dialog.appDialog::backdrop{background:rgba(2,6,20,.72);backdrop-filter:blur(4px)}
+  .dialogHead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #2a3a7a66}
+  .dialogHead h2{font-size:16px;margin:0}
+  .dialogBody{padding:16px;line-height:1.7;font-size:13px;color:var(--muted)}
+  .dialogBody h3{margin:16px 0 6px;color:var(--ink);font-size:14px}
+  .dialogBody ul{padding-left:1.4em;margin:6px 0}
+  .dialogBody b{color:var(--ink)}
+  .closeBtn{border:1px solid #2a3a7a88;background:#101b40;color:var(--ink);border-radius:10px;padding:7px 10px;cursor:pointer}
+  .qrWrap{text-align:center}
+  .qrWrap img{width:min(280px,72vw);height:auto;background:#fff;padding:12px;border-radius:14px}
+  .qrUrl{margin-top:10px;color:var(--accent);word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .copyright{max-width:1200px;margin:0 auto;padding:0 14px 14px;text-align:right;color:#7f8bb6;font-size:11px}
+  .wrap{display:grid;grid-template-columns: 1fr; gap:10px; padding:10px 12px 16px; max-width:1200px; margin:0 auto;}
+  @media (min-width: 980px){ .wrap{grid-template-columns: 1fr 420px;} }
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  .stage{padding:10px;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#070b16; border:1px solid var(--line);}
+  .side{padding:12px 12px 10px; display:flex; flex-direction:column; gap:10px;}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .btn{
+    border:0; padding:10px 12px; border-radius:12px; color:var(--ink);
+    background:linear-gradient(180deg,var(--btn2),var(--btn));
+    cursor:pointer; font-weight:800; letter-spacing:.02em;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:#0000;border:1px solid #2a3a7a88}
+  .btn.small{padding:7px 10px;font-size:12px;border-radius:10px}
+  label{font-size:12px;color:var(--muted)}
+  input[type="range"]{width:100%}
+  input[type="number"]{width:92px; padding:7px 8px; border-radius:10px; border:1px solid #2a3a7a88; background:#0a1230; color:var(--ink);}
+  .kv{display:grid; grid-template-columns: 1fr auto; gap:6px 10px; font-size:12px; color:var(--muted)}
+  .kv b{color:var(--ink); font-weight:800}
+  .note{font-size:12px;color:var(--muted); line-height:1.5}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#0f1a3e;border:1px solid #2a3a7a66;font-size:12px;color:var(--muted)}
+  .warn{color:#ffd88a}
+  .ok{color:#9ff0c5}
+  .table{
+    width:100%;
+    border-collapse: collapse;
+    font-size:12px;
+    color:var(--muted);
+    overflow:hidden;
+    border-radius:12px;
+  }
+  .table th,.table td{
+    border-bottom:1px solid #2a3a7a44;
+    padding:8px 6px;
+    vertical-align:middle;
+  }
+  .table th{color:var(--ink); text-align:left; font-weight:800;}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid #2a3a7a88;background:#0a1230;color:var(--muted);font-size:11px}
+  .mono{font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+</style>
+</head>
+<body>
+<header>
+  <div class="headerBar">
+    <button id="btnQR" class="iconBtn" type="button" aria-label="このアプリのQRコードを表示" title="QRコード">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" aria-hidden="true">
+        <rect x="3" y="3" width="6" height="6" rx="1"></rect>
+        <rect x="15" y="3" width="6" height="6" rx="1"></rect>
+        <rect x="3" y="15" width="6" height="6" rx="1"></rect>
+        <path d="M15 15h2v2h-2zm4 0h2v4h-2zm-4 4h4v2h-4z"></path>
+      </svg>
+    </button>
+    <h1>❄️ 雪結晶 成長シミュレーター（中谷ダイアグラム風 + 途中で温度/湿度を切替：樹枝状保証版）</h1>
+    <button id="btnHelp" class="iconBtn" type="button" aria-label="使い方と特徴を表示" title="ヘルプ">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M9.8 9a2.5 2.5 0 1 1 3.7 2.2c-1 .6-1.5 1.1-1.5 2.3"></path>
+        <path d="M12 17.2h.01"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="card stage">
+    <canvas id="cv" width="900" height="900" aria-label="snowflake canvas"></canvas>
+  </div>
+
+  <div class="card side">
+    <div class="row">
+      <button id="btnStart" class="btn">▶ 開始</button>
+      <button id="btnStep" class="btn ghost">＋1ステップ</button>
+      <button id="btnReset" class="btn ghost">↺ リセット</button>
+      <button id="btnSnap" class="btn ghost">📷 PNG保存</button>
+    </div>
+
+    <div class="row">
+      <span class="pill">現在の条件</span>
+      <span class="tag">温度 <b id="tempLabel">−15℃</b></span>
+      <span class="tag">湿度 <b id="supLabel">高</b></span>
+      <span class="tag">モード <b id="modeLabel">樹枝状</b></span>
+    </div>
+
+    <div>
+      <label>温度（手動）</label>
+      <input id="temp" type="range" min="-35" max="-2" step="1" value="-15">
+    </div>
+
+    <div>
+      <label>湿度/過飽和度（手動）</label>
+      <input id="sup" type="range" min="0" max="100" step="1" value="92">
+    </div>
+
+    <div class="row">
+      <label style="display:flex;gap:8px;align-items:center">
+        <input id="symLock" type="checkbox">
+        6回対称ロック（ONにすると六角形に寄りがち）
+      </label>
+      <label style="display:flex;gap:8px;align-items:center">
+        <input id="showVapor" type="checkbox">
+        水蒸気（背景）を表示
+      </label>
+    </div>
+
+    <div class="kv">
+      <div>ステップ</div><b id="steps">0</b>
+      <div>氷セル数</div><b id="iceCount">0</b>
+      <div>内部パラメータ</div><b id="params" class="mono">—</b>
+    </div>
+
+    <div class="row">
+      <span class="pill">中谷ダイアグラム風プリセット</span>
+      <button class="btn ghost small" data-nakaya="plate">板状（−10帯）</button>
+      <button class="btn ghost small" data-nakaya="column">柱状（−5/−20帯）</button>
+      <button class="btn ghost small" data-nakaya="dendrite">樹枝状（−15帯）</button>
+    </div>
+
+    <div class="row">
+      <span class="pill">条件切替プログラム</span>
+      <label style="display:flex;gap:8px;align-items:center">
+        <input id="useProgram" type="checkbox" checked>
+        プログラムを使用（ONで途中切替）
+      </label>
+    </div>
+
+    <div class="row">
+      <button id="btnAddStage" class="btn ghost small">＋ステージ追加</button>
+      <button id="btnClearStages" class="btn ghost small">🧹 クリア</button>
+      <button id="btnFan" class="btn ghost small">🪭 扇六花モード</button>
+      <button id="btnNakayaTour" class="btn ghost small">🗺 温度帯ツアー</button>
+    </div>
+
+    <div class="note">
+      <b class="ok">この版の違い：</b><br>
+      ・水蒸気は <span class="warn">外周リングからのみ供給</span>（拡散律速）<br>
+      ・1ステップで氷化する数を <span class="warn">上限(maxAttach)</span> で制限<br>
+      ・付着は「先端＋水蒸気が多いセル」を <span class="warn">重み付き抽選</span>で選抜<br>
+      → これで <b>樹枝状/扇六花が確実に出ます</b>。
+    </div>
+
+    <div style="border:1px solid #2a3a7a44;border-radius:12px;overflow:hidden">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th><th>継続(steps)</th><th>温度</th><th>湿度</th><th>狙い</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="stageBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer class="copyright">© Science Comunication Design Laboratory, Kagawa University</footer>
+
+<dialog id="qrDialog" class="appDialog" aria-labelledby="qrTitle">
+  <div class="dialogHead">
+    <h2 id="qrTitle">このアプリのQRコード</h2>
+    <button id="qrClose" class="closeBtn" type="button">閉じる</button>
+  </div>
+  <div class="dialogBody qrWrap">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&amp;data=https%3A%2F%2Fscd-ku.github.io%2Fsnowflake%2F" alt="https://scd-ku.github.io/snowflake/ のQRコード">
+    <div class="qrUrl">https://scd-ku.github.io/snowflake/</div>
+  </div>
+</dialog>
+
+<dialog id="helpDialog" class="appDialog" aria-labelledby="helpTitle">
+  <div class="dialogHead">
+    <h2 id="helpTitle">特徴と使い方</h2>
+    <button id="helpClose" class="closeBtn" type="button">閉じる</button>
+  </div>
+  <div class="dialogBody">
+    <h3>このアプリの特徴</h3>
+    <ul>
+      <li><b>温度と湿度（過飽和度）</b>を変えながら、雪結晶の成長を観察できます。</li>
+      <li>中谷ダイアグラムを参考にした<b>板状・柱状・樹枝状</b>のプリセットを切り替えられます。</li>
+      <li>複数の条件をステージとして並べ、成長途中で温度・湿度を自動的に切り替えられます。</li>
+      <li><b>扇六花モード</b>や<b>温度帯ツアー</b>で、条件変化による形の違いを比較できます。</li>
+      <li>6回対称ロック、水蒸気分布の表示、PNG保存に対応しています。</li>
+    </ul>
+
+    <h3>基本の使い方</h3>
+    <ul>
+      <li><b>開始</b>で連続成長、<b>＋1ステップ</b>で1段階ずつ変化を確認します。</li>
+      <li><b>リセット</b>で最初からやり直します。<b>PNG保存</b>で現在の結晶を画像保存できます。</li>
+      <li>手動で試す場合は「プログラムを使用」をOFFにし、温度・湿度のスライダーを動かします。</li>
+      <li>途中で条件を変える場合は「プログラムを使用」をONにし、各ステージの継続ステップ・温度・湿度を編集します。</li>
+      <li>水蒸気の供給と成長の関係を見たい場合は「水蒸気（背景）を表示」をONにします。</li>
+    </ul>
+
+    <h3>学習で見るポイント</h3>
+    <p>同じ水からできる雪結晶でも、成長時の温度や水蒸気量が変わると形が変化します。条件を一つずつ変えたり、成長途中で切り替えたりして、形の変化と環境条件の関係を比較してください。</p>
+
+    <h3>注意</h3>
+    <p>このシミュレーターは雪結晶の形態変化を理解するための<b>教育用の簡略モデル</b>です。実際の結晶成長を定量的に再現する物理シミュレーションではありません。</p>
+  </div>
+</dialog>
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+const ui = {
+  btnStart: document.getElementById('btnStart'),
+  btnStep: document.getElementById('btnStep'),
+  btnReset: document.getElementById('btnReset'),
+  btnSnap: document.getElementById('btnSnap'),
+  temp: document.getElementById('temp'),
+  sup: document.getElementById('sup'),
+  tempLabel: document.getElementById('tempLabel'),
+  supLabel: document.getElementById('supLabel'),
+  modeLabel: document.getElementById('modeLabel'),
+  symLock: document.getElementById('symLock'),
+  showVapor: document.getElementById('showVapor'),
+  steps: document.getElementById('steps'),
+  iceCount: document.getElementById('iceCount'),
+  params: document.getElementById('params'),
+  useProgram: document.getElementById('useProgram'),
+  btnAddStage: document.getElementById('btnAddStage'),
+  btnClearStages: document.getElementById('btnClearStages'),
+  btnFan: document.getElementById('btnFan'),
+  btnNakayaTour: document.getElementById('btnNakayaTour'),
+  stageBody: document.getElementById('stageBody'),
+  btnQR: document.getElementById('btnQR'),
+  btnHelp: document.getElementById('btnHelp'),
+  qrDialog: document.getElementById('qrDialog'),
+  helpDialog: document.getElementById('helpDialog'),
+  qrClose: document.getElementById('qrClose'),
+  helpClose: document.getElementById('helpClose')
+};
+
+const W = cv.width, H = cv.height;
+let R = 120;
+let running = false;
+let rafId = null;
+
+const DIRS = [
+  [ 1, 0], [ 1,-1], [ 0,-1],
+  [-1, 0], [-1, 1], [ 0, 1]
+];
+
+function rot60(q,r){
+  const x=q, z=r, y=-x-z;
+  const x2 = -z, y2 = -x, z2 = -y;
+  return [x2, z2];
+}
+function rotN(q,r,n){
+  let a=q,b=r;
+  for(let i=0;i<n;i++){ [a,b]=rot60(a,b); }
+  return [a,b];
+}
+function inHex(q,r){
+  const x=q, z=r, y=-x-z;
+  return Math.max(Math.abs(x),Math.abs(y),Math.abs(z)) <= R;
+}
+const key = (q,r)=> `${q},${r}`;
+function clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
+
+let ice = new Map();
+let vapor = new Map();
+let stepCount = 0;
+let iceCount = 0;
+
+// ====== ステージ（扇六花/樹枝状が確実に出る初期セット） ======
+let stages = [
+  {steps: 520, tC:-15, sup:96, label:"樹枝状：枝を出す（確実）"},
+  {steps: 260, tC:-10, sup:52, label:"板/セクター：太らせる"},
+  {steps: 420, tC:-15, sup:86, label:"樹枝状：再分岐"},
+  {steps: 220, tC:-10, sup:45, label:"板/セクター：扇を整える"},
+];
+
+function totalProgramSteps(){
+  return stages.reduce((a,s)=>a+Math.max(0,Number(s.steps||0)),0);
+}
+function getStageAt(step){
+  if(!ui.useProgram.checked || stages.length===0){
+    return {tC:Number(ui.temp.value), sup:Number(ui.sup.value), label:"手動"};
+  }
+  const total = totalProgramSteps();
+  if(total<=0) return {tC:Number(ui.temp.value), sup:Number(ui.sup.value), label:"手動"};
+  const s = step % total;
+  let acc = 0;
+  for(const st of stages){
+    const len = Math.max(0, Number(st.steps||0));
+    if(s < acc + len) return {tC:Number(st.tC), sup:Number(st.sup), label:st.label || "—"};
+    acc += len;
+  }
+  const last = stages[stages.length-1];
+  return {tC:Number(last.tC), sup:Number(last.sup), label:last.label || "—"};
+}
+
+function renderStageTable(){
+  ui.stageBody.innerHTML = "";
+  stages.forEach((st, idx)=>{
+    const tr = document.createElement("tr");
+
+    const tdIdx = document.createElement("td"); tdIdx.textContent = String(idx+1); tr.appendChild(tdIdx);
+
+    const tdSteps = document.createElement("td");
+    const inSteps = document.createElement("input");
+    inSteps.type="number"; inSteps.min="0"; inSteps.step="10"; inSteps.value=String(st.steps);
+    inSteps.addEventListener("change", ()=> st.steps = Number(inSteps.value)||0);
+    tdSteps.appendChild(inSteps); tr.appendChild(tdSteps);
+
+    const tdT = document.createElement("td");
+    const inT = document.createElement("input");
+    inT.type="number"; inT.min="-35"; inT.max="-2"; inT.step="1"; inT.value=String(st.tC);
+    inT.addEventListener("change", ()=> st.tC = Number(inT.value)||-15);
+    tdT.appendChild(inT); tr.appendChild(tdT);
+
+    const tdSup = document.createElement("td");
+    const inSup = document.createElement("input");
+    inSup.type="number"; inSup.min="0"; inSup.max="100"; inSup.step="1"; inSup.value=String(st.sup);
+    inSup.addEventListener("change", ()=>{ st.sup = clamp(Number(inSup.value)||70,0,100); inSup.value=String(st.sup); });
+    tdSup.appendChild(inSup); tr.appendChild(tdSup);
+
+    const tdLab = document.createElement("td");
+    const inLab = document.createElement("input");
+    inLab.type="text"; inLab.value=st.label||""; inLab.style.width="160px";
+    inLab.addEventListener("change", ()=> st.label = inLab.value);
+    tdLab.appendChild(inLab); tr.appendChild(tdLab);
+
+    const tdDel = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.className="btn ghost small"; btn.textContent="削除";
+    btn.addEventListener("click", ()=>{ stages.splice(idx,1); renderStageTable(); });
+    tdDel.appendChild(btn); tr.appendChild(tdDel);
+
+    ui.stageBody.appendChild(tr);
+  });
+}
+
+// ====== 中谷帯（簡略） ======
+function bandFromTemp(tC){
+  if(tC >= -8) return "column";      // -2..-8
+  if(tC >= -13) return "plate";      // -8..-13
+  if(tC >= -18) return "dendrite";   // -13..-18
+  if(tC >= -26) return "column";     // -18..-26
+  return "plate";                    // -26..-35
+}
+
+// ====== この版の肝：外周供給＆付着数制限 ======
+// 外周リング幅（dist>EDGE_START をリザーバ扱い）
+const EDGE_START = 0.90;
+
+// 供給：sup(0..100) -> 外周リザーバ水蒸気量
+function edgeReservoirFromSup(sup){
+  // 樹枝状を出すため、上限を大きく
+  // 0..100 -> 16..70
+  return 16 + 54*(sup/100);
+}
+
+// パラメータ（帯域ごと＋確実に形が出るチューニング）
+function paramsFrom(tC, sup){
+  const sup01 = clamp(sup/100,0,1);
+  const band = bandFromTemp(tC);
+  const cold = clamp(((-2) - tC)/33, 0, 1);
+
+  // 共通：外周リザーバ
+  const edgeV = edgeReservoirFromSup(sup);
+
+  let anis, surf, stick, airDiff, noise, vPow, csPow, maxAttach, consume;
+
+  if(band==="dendrite"){
+  // ★ロゴ寄せ：主枝くっきり／先端を強烈に選抜／ノイズ弱め
+  anis = 0.95;
+  surf = 0.03;               // 表面拡散を弱め（枝を丸めない）
+  stick = 0.12;              // 面が太りにくい
+  airDiff = 0.10;            // 拡散影は維持
+  noise = 0.03 + 0.02*sup01; // ←大幅に減らす（荒れ防止）
+  vPow = 1.55;               // vaporが多い先端をさらに優遇
+  csPow = 4.2;               // ←先端優遇を強化（重要）
+  maxAttach = Math.round(1 + 3*sup01); // ←さらに絞る（1～4程度）
+  consume = 0.01;            // 先端が餓えにくい
+}
+ else if(band==="plate"){
+    // 板/セクター：面が太る（付着数多め＆平滑化）
+    anis = 0.22;
+    surf = 0.24;
+    stick = 0.40;
+    airDiff = 0.17;
+    noise = 0.02 + 0.02*sup01;
+    vPow = 0.85;
+    csPow = 1.0;
+    maxAttach = Math.round(10 + 20*sup01); // 面を育てるので多め
+    consume = 0.10;
+  } else { // column
+    // 柱/針：中間（枝は少なめ）
+    anis = 0.55;
+    surf = 0.10;
+    stick = 0.30;
+    airDiff = 0.12;
+    noise = 0.04 + 0.03*sup01;
+    vPow = 1.00;
+    csPow = 1.6;
+    maxAttach = Math.round(4 + 10*sup01);
+    consume = 0.06;
+  }
+
+  // 低温補正（荒れやすさ等）
+  stick = clamp(stick + 0.08*cold, 0.10, 0.75);
+  airDiff = clamp(airDiff*(1-0.35*cold), 0.05, 0.22);
+  noise = clamp(noise + 0.05*cold, 0.01, 0.20);
+
+  return {band, anis, surf, stick, airDiff, noise, vPow, csPow, maxAttach, consume, edgeV};
+}
+
+// ====== 状態操作 ======
+function getV(q,r){ return vapor.get(key(q,r)) ?? 0; }
+function setV(q,r,val){ vapor.set(key(q,r), val); }
+function isIce(q,r){ return ice.has(key(q,r)); }
+
+function setIce(q,r,forceNoSym=false){
+  const k = key(q,r);
+  if(!ice.has(k)){
+    ice.set(k,1);
+    iceCount++;
+  }
+  if(ui.symLock.checked && !forceNoSym){
+    for(let n=1;n<6;n++){
+      const [qq,rr]=rotN(q,r,n);
+      if(!inHex(qq,rr)) continue;
+      const kk=key(qq,rr);
+      if(!ice.has(kk)){
+        ice.set(kk,1);
+        iceCount++;
+      }
+    }
+  }
+}
+
+function neighbors(q,r){
+  const out=[];
+  for(const [dq,dr] of DIRS) out.push([q+dq, r+dr]);
+  return out;
+}
+
+function collectBoundary(){
+  const cand = new Map();
+  for(const k of ice.keys()){
+    const [q,r]=k.split(',').map(Number);
+    for(const [nq,nr] of neighbors(q,r)){
+      if(!inHex(nq,nr)) continue;
+      if(isIce(nq,nr)) continue;
+      const nk=key(nq,nr);
+      const cur = cand.get(nk);
+      if(cur) cur.nIceNeighbors++;
+      else cand.set(nk, {q:nq,r:nr,nIceNeighbors:1});
+    }
+  }
+  return [...cand.values()];
+}
+
+function cornerScore(nIceNeighbors){
+  if(nIceNeighbors<=1) return 1.0;
+  if(nIceNeighbors===2) return 0.65;
+  if(nIceNeighbors===3) return 0.30;
+  return 0.12;
+}
+
+function hexDist01(q,r){
+  const x=q, z=r, y=-x-z;
+  return Math.max(Math.abs(x),Math.abs(y),Math.abs(z)) / R; // 0..1
+}
+// ====== ロゴ寄せ：6本スポーク方向に伸びやすくする ======
+const ARM_EXP = 6.0;       // 大きいほど“軸が細く長く”
+const ARM_STRENGTH = 2.0;  // 大きいほど“主枝優先”
+
+function armFactor(q,r){
+  // cube座標
+  const x = q, z = r, y = -x - z;
+  const d = Math.max(Math.abs(x),Math.abs(y),Math.abs(z));
+  if(d <= 1) return 1.0; // 中心付近は何でも伸びてよい
+
+  // 6方向（cube）への射影の最大値で“軸っぽさ”を測る
+  const dirs = [
+    [ 1,-1, 0],[ 1, 0,-1],[ 0, 1,-1],
+    [-1, 1, 0],[-1, 0, 1],[ 0,-1, 1],
+  ];
+  let best = 0;
+  for(const [dx,dy,dz] of dirs){
+    const dot = x*dx + y*dy + z*dz; // 軸方向に大きくなる
+    best = Math.max(best, Math.abs(dot) / d); // 0..1
+  }
+  return Math.pow(best, ARM_EXP); // 0..1（軸に近いほど1）
+}
+
+function reset(){
+  ice.clear();
+  vapor.clear();
+  stepCount = 0;
+  iceCount = 0;
+
+  // ★初期は「外周にだけ水蒸気」：最初から拡散律速にする
+  for(let q=-R;q<=R;q++){
+    for(let r=-R;r<=R;r++){
+      if(!inHex(q,r)) continue;
+      const d = hexDist01(q,r);
+      vapor.set(key(q,r), d>EDGE_START ? 30.0 : 0.2);
+    }
+  }
+
+  setIce(0,0,true);
+  draw();
+  updateUI();
+}
+
+// ====== 付着セルの「重み付き抽選」 ======
+function weightedSample(items, weights, k){
+  const out = [];
+  const poolItems = items.slice();
+  const poolW = weights.slice();
+
+  for(let t=0; t<k && poolItems.length>0; t++){
+    let sum = 0;
+    for(const w of poolW) sum += w;
+    if(sum <= 0) break;
+
+    let r = Math.random()*sum;
+    let idx = 0;
+    for(; idx<poolW.length; idx++){
+      r -= poolW[idx];
+      if(r<=0) break;
+    }
+    if(idx>=poolItems.length) idx = poolItems.length-1;
+
+    out.push(poolItems[idx]);
+    poolItems.splice(idx,1);
+    poolW.splice(idx,1);
+  }
+  return out;
+}
+
+// ====== 1ステップ ======
+function step(){
+  const st = getStageAt(stepCount);
+  const tC = st.tC;
+  const sup = st.sup;
+
+  if(ui.useProgram.checked){
+    ui.temp.value = String(tC);
+    ui.sup.value = String(sup);
+  }
+
+  const P = paramsFrom(tC, sup);
+
+  // (0) 外周リザーバ：dist>EDGE_START のセルは v >= edgeV を保証（ここが重要）
+  for(let q=-R;q<=R;q++){
+    for(let r=-R;r<=R;r++){
+      if(!inHex(q,r)) continue;
+      if(isIce(q,r)) { setV(q,r,0); continue; }
+      const d = hexDist01(q,r);
+      if(d > EDGE_START){
+        setV(q,r, Math.max(getV(q,r), P.edgeV));
+      }
+    }
+  }
+
+  // (A) 気相拡散（vapor平滑化：氷を避けて拡散）
+  const newV = new Map(vapor);
+  for(let q=-R;q<=R;q++){
+    for(let r=-R;r<=R;r++){
+      if(!inHex(q,r)) continue;
+      const k = key(q,r);
+      if(isIce(q,r)) { newV.set(k, 0); continue; }
+      let sum = getV(q,r), cnt = 1;
+      for(const [nq,nr] of neighbors(q,r)){
+        if(!inHex(nq,nr)) continue;
+        if(isIce(nq,nr)) continue;
+        sum += getV(nq,nr);
+        cnt++;
+      }
+      const avg = sum/cnt;
+      const v = getV(q,r);
+      newV.set(k, v + P.airDiff*(avg - v));
+    }
+  }
+  vapor = newV;
+
+  const boundary = collectBoundary();
+  if(boundary.length===0){
+    stepCount++;
+    return;
+  }
+
+  // (B) 表面拡散（境界で、少し先端寄りに材料移動）
+  if(P.surf>0){
+    const bset = new Set(boundary.map(o=>key(o.q,o.r)));
+    const delta = new Map();
+    for(const b of boundary){
+      const v = getV(b.q,b.r);
+      if(v<=0) continue;
+
+      let best = null, bestScore = -1;
+      for(const [nq,nr] of neighbors(b.q,b.r)){
+        const nk = key(nq,nr);
+        if(!bset.has(nk)) continue;
+        let ni=0;
+        for(const [aq,ar] of neighbors(nq,nr)){
+          if(isIce(aq,ar)) ni++;
+        }
+        const s = cornerScore(ni);
+        if(s>bestScore){ bestScore=s; best={q:nq,r:nr}; }
+      }
+      if(!best) continue;
+
+      const move = v * P.surf * 0.18;
+      if(move<=0) continue;
+
+      const k1=key(b.q,b.r), k2=key(best.q,best.r);
+      delta.set(k1,(delta.get(k1)||0)-move);
+      delta.set(k2,(delta.get(k2)||0)+move);
+    }
+    for(const [k,d] of delta){
+      const [q,r]=k.split(',').map(Number);
+      setV(q,r, Math.max(0, getV(q,r)+d));
+    }
+  }
+
+  // (C) 成長（付着）
+  // ★「確実に樹枝状」を作るため、境界セルを重み付き抽選して maxAttach 個だけ氷化
+  const items = [];
+  const weights = [];
+  for(const b of boundary){
+    const v = getV(b.q,b.r);
+    if(v<=0) continue;
+
+    const cs = cornerScore(b.nIceNeighbors);
+    // 先端強優遇：csPow が効く（樹枝状帯では 3.0）
+    const tip = Math.pow(cs, P.csPow);
+
+    // vaporが多いところを優遇：vPow
+    const vv = Math.pow(Math.max(0.0001, v), P.vPow);
+
+    // 付着の基礎（stick）と少量ノイズ
+// 付着の基礎（stick）
+let w = P.stick * vv * (0.12 + 2.20*P.anis*tip);
+
+// ★面（隣接氷が多い）を強く罰する：主枝が立つ
+// nIceNeighbors: 1(先端)が最強、2は弱、3以上はほぼ止める
+const nb = b.nIceNeighbors;
+const nbPenalty =
+  (nb<=1) ? 1.00 :
+  (nb===2) ? 0.35 :
+  (nb===3) ? 0.08 : 0.03;
+w *= nbPenalty;
+
+// ★6本スポーク方向の優遇（雪印っぽく）
+const af = armFactor(b.q, b.r); // 0..1
+w *= (1.0 + ARM_STRENGTH * af);
+
+// 微ランダム（※ノイズは小さく）
+w *= (0.95 + 0.10*Math.random());
+w += (Math.random()-0.5) * P.noise;
+
+    w *= (0.90 + 0.30*Math.random()); // 微ランダム
+    w += (Math.random()-0.5) * P.noise;
+
+    if(w>0){
+      items.push(b);
+      weights.push(w);
+    }
+  }
+
+  const pickN = Math.max(1, Math.min(P.maxAttach, items.length));
+  const chosen = weightedSample(items, weights, pickN);
+
+  for(const b of chosen){
+    const v = getV(b.q,b.r);
+    setIce(b.q,b.r);
+    setV(b.q,b.r, Math.max(0, v*P.consume));
+  }
+
+  stepCount++;
+}
+
+// ====== 描画 ======
+function axialToXY(q,r,size){
+  const x = size * (Math.sqrt(3)*q + Math.sqrt(3)/2*r);
+  const y = size * (3/2*r);
+  return [x,y];
+}
+function drawHex(x,y,size){
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const a = (Math.PI/180) * (60*i - 30);
+    const px = x + size*Math.cos(a);
+    const py = y + size*Math.sin(a);
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.closePath();
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const size = Math.min(W,H) / (R*2.35);
+  const cx = W/2, cy = H/2;
+
+  if(ui.showVapor.checked){
+    for(let q=-R;q<=R;q++){
+      for(let r=-R;r<=R;r++){
+        if(!inHex(q,r)) continue;
+        if(isIce(q,r)) continue;
+        const v = getV(q,r);
+        const t = clamp(v/70, 0, 1);
+        if(t<=0) continue;
+        const [x,y]=axialToXY(q,r,size);
+        ctx.fillStyle = `rgba(125, 211, 252, ${0.18*t})`;
+        drawHex(cx+x, cy+y, size*0.98);
+        ctx.fill();
+      }
+    }
+  }
+
+  ctx.fillStyle = "rgba(240, 248, 255, 0.98)";
+  for(const k of ice.keys()){
+    const [q,r]=k.split(',').map(Number);
+    const [x,y]=axialToXY(q,r,size);
+    drawHex(cx+x, cy+y, size*0.98);
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = "rgba(125, 211, 252, 0.22)";
+  ctx.lineWidth = 1;
+  for(const k of ice.keys()){
+    const [q,r]=k.split(',').map(Number);
+    const [x,y]=axialToXY(q,r,size);
+    drawHex(cx+x, cy+y, size*0.98);
+    ctx.stroke();
+  }
+}
+
+function updateUI(){
+  const tC = Number(ui.temp.value);
+  const sup = Number(ui.sup.value);
+  ui.tempLabel.textContent = `${tC}℃`;
+  ui.steps.textContent = String(stepCount);
+  ui.iceCount.textContent = String(iceCount);
+
+  ui.supLabel.textContent =
+    sup<33 ? "低" :
+    sup<67 ? "中" : "高";
+
+  const st = getStageAt(stepCount);
+  const P = paramsFrom(st.tC, st.sup);
+
+  ui.modeLabel.textContent =
+    (P.band==="dendrite") ? "樹枝状" :
+    (P.band==="plate") ? "板/セクター" : "柱/針";
+
+  ui.params.textContent =
+    `band=${P.band} anis=${P.anis.toFixed(2)} surf=${P.surf.toFixed(2)} stick=${P.stick.toFixed(2)} airDiff=${P.airDiff.toFixed(2)} noise=${P.noise.toFixed(2)} vPow=${P.vPow.toFixed(2)} csPow=${P.csPow.toFixed(2)} maxA=${P.maxAttach} cons=${P.consume.toFixed(2)} edgeV=${P.edgeV.toFixed(1)}`;
+}
+
+function loop(){
+  if(!running) return;
+  for(let i=0;i<3;i++) step();
+  draw();
+  updateUI();
+  rafId = requestAnimationFrame(loop);
+}
+
+// ====== UI ======
+ui.btnStart.addEventListener('click', ()=>{
+  running = !running;
+  ui.btnStart.textContent = running ? "⏸ 停止" : "▶ 開始";
+  if(running) loop();
+  else if(rafId) cancelAnimationFrame(rafId);
+});
+ui.btnStep.addEventListener('click', ()=>{
+  if(running) return;
+  step(); draw(); updateUI();
+});
+ui.btnReset.addEventListener('click', ()=>{
+  running=false;
+  ui.btnStart.textContent="▶ 開始";
+  if(rafId) cancelAnimationFrame(rafId);
+  reset();
+});
+ui.btnSnap.addEventListener('click', ()=>{
+  const a=document.createElement("a");
+  a.download=`snowflake_step${stepCount}.png`;
+  a.href=cv.toDataURL("image/png");
+  a.click();
+});
+ui.temp.addEventListener('input', ()=> updateUI());
+ui.sup.addEventListener('input', ()=> updateUI());
+ui.showVapor.addEventListener('change', ()=> draw());
+
+ui.btnQR.addEventListener('click', ()=> ui.qrDialog.showModal());
+ui.btnHelp.addEventListener('click', ()=> ui.helpDialog.showModal());
+ui.qrClose.addEventListener('click', ()=> ui.qrDialog.close());
+ui.helpClose.addEventListener('click', ()=> ui.helpDialog.close());
+[ui.qrDialog, ui.helpDialog].forEach(dialog=>{
+  dialog.addEventListener('click', (e)=>{
+    const rect = dialog.getBoundingClientRect();
+    const outside = e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom;
+    if(outside) dialog.close();
+  });
+});
+
+ui.btnAddStage.addEventListener('click', ()=>{
+  stages.push({steps:300, tC:-15, sup:90, label:"追加ステージ"});
+  renderStageTable();
+});
+ui.btnClearStages.addEventListener('click', ()=>{
+  stages=[]; renderStageTable();
+});
+
+// ★扇六花：確実に「枝→セクター→枝→セクター」
+ui.btnFan.addEventListener('click', ()=>{
+  stages = [
+    {steps: 520, tC:-15, sup:96, label:"樹枝状：枝を出す（確実）"},
+    {steps: 260, tC:-10, sup:52, label:"板/セクター：太らせる"},
+    {steps: 420, tC:-15, sup:86, label:"樹枝状：再分岐"},
+    {steps: 220, tC:-10, sup:45, label:"板/セクター：扇を整える"},
+  ];
+  ui.useProgram.checked = true;
+  renderStageTable();
+  updateUI();
+});
+
+// 温度帯ツアー（各帯が“必ず”違って見える値）
+ui.btnNakayaTour.addEventListener('click', ()=>{
+  stages = [
+    {steps: 360, tC:-5,  sup:75, label:"柱/針（−5）"},
+    {steps: 360, tC:-10, sup:50, label:"板/セクター（−10）"},
+    {steps: 520, tC:-15, sup:96, label:"樹枝状（−15）"},
+    {steps: 360, tC:-20, sup:70, label:"柱/針（−20）"},
+    {steps: 360, tC:-30, sup:55, label:"板（−30）"},
+  ];
+  ui.useProgram.checked = true;
+  renderStageTable();
+  updateUI();
+});
+
+// 手動プリセット（確実に出る値に固定）
+document.querySelectorAll('[data-nakaya]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const kind = btn.getAttribute('data-nakaya');
+    ui.useProgram.checked = false;
+    if(kind==="plate"){ ui.temp.value="-10"; ui.sup.value="50"; }
+    if(kind==="column"){ ui.temp.value="-5"; ui.sup.value="75"; }
+    if(kind==="dendrite"){ ui.temp.value="-15"; ui.sup.value="96"; }
+    updateUI();
+  });
+});
+
+// 初期化
+renderStageTable();
+reset();
+updateUI();
+</script>
+</body>
+</html>
