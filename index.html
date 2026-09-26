@@ -202,6 +202,147 @@ dialog.appDialog::backdrop{background:rgba(20,30,43,.42)!important;backdrop-filt
   color:var(--muted);font-size:11px;
 }
 </style>
+
+<style id="nordic-v3">
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+:root{
+  --ink:#26323c; --muted:#65727e; --gold:#887761;
+  --glass:rgba(247,250,252,.40); --line:rgba(255,255,255,.62);
+  --shadow:0 14px 42px rgba(38,52,67,.14);
+  --panel-radius:14px; --control-radius:7px;
+}
+body{
+  font-family:"Inter","Noto Sans JP","Avenir Next","Helvetica Neue",Arial,sans-serif!important;
+  font-weight:300!important;
+  letter-spacing:.005em!important;
+}
+header{
+  border-radius:13px!important;
+  padding:10px 12px!important;
+  margin-top:12px!important;
+}
+.headerBar{grid-template-columns:40px 1fr 40px!important;gap:10px!important}
+h1{
+  font-family:"Inter","Noto Sans JP","Avenir Next","Helvetica Neue",sans-serif!important;
+  font-size:24px!important;font-weight:300!important;letter-spacing:.045em!important;
+  line-height:1.12!important;
+}
+.appSub{font-size:9px!important;letter-spacing:.13em!important;margin-top:3px!important;font-weight:300!important}
+.iconBtn{
+  width:38px!important;height:38px!important;border-radius:8px!important;
+  box-shadow:0 7px 18px rgba(60,77,98,.08)!important;
+}
+.iconBtn svg{width:20px!important;height:20px!important}
+.wrap{
+  max-width:1200px!important;gap:12px!important;padding:12px 0 14px!important;
+  position:relative;
+  grid-template-columns:1fr!important;
+  transition:grid-template-columns .26s ease;
+}
+@media (min-width:980px){
+  .wrap{grid-template-columns:minmax(0,1fr) 390px!important}
+  .wrap.panel-collapsed{grid-template-columns:minmax(0,1fr) 0px!important}
+}
+.card{
+  border-radius:14px!important;
+  box-shadow:var(--shadow)!important;
+}
+.stage{padding:10px!important}
+canvas{
+  border-radius:12px!important;
+  background:rgba(28,40,51,.52)!important;
+  border:1px solid rgba(255,255,255,.46)!important;
+  box-shadow:inset 0 0 36px rgba(12,22,31,.18)!important;
+}
+.side{
+  padding:9px!important;gap:7px!important;
+  min-width:0;
+  transition:transform .26s ease,opacity .20s ease,padding .26s ease,border-color .26s ease;
+}
+@media (min-width:980px){
+  .wrap.panel-collapsed .side{
+    transform:translateX(calc(100% + 24px));
+    opacity:0;pointer-events:none;padding-left:0!important;padding-right:0!important;
+    border-color:transparent!important;
+  }
+}
+@media (max-width:979px){
+  .wrap.panel-collapsed .side{display:none}
+}
+.panelToggle{
+  position:fixed;right:8px;top:50%;transform:translateY(-50%);
+  width:28px;height:54px;z-index:20;
+  border:1px solid rgba(255,255,255,.74);border-radius:7px 0 0 7px;
+  background:rgba(247,250,252,.64);color:var(--ink);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 8px 22px rgba(43,59,78,.14);
+  cursor:pointer;font:300 20px/1 "Inter",sans-serif;
+}
+.panelToggle:hover{background:rgba(255,255,255,.82)}
+.controlSection{
+  padding:9px 10px 8px;
+  border:1px solid rgba(255,255,255,.44);
+  border-radius:8px!important;
+  background:rgba(255,255,255,.20);
+}
+.controlSection h2{
+  margin:0 0 6px;font-size:10px;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;color:#51606c;
+}
+.controlSection h2 .jp{font-weight:300;letter-spacing:.04em;text-transform:none;margin-left:6px}
+.compactRow{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin:0 0 5px}
+.compactRow:last-child{margin-bottom:0}
+.rangeBlock{margin:4px 0 5px}
+.rangeHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:1px}
+.rangeHead label{font-size:10px!important}
+.rangeValue{font-size:10px;color:#43515d;font-variant-numeric:tabular-nums}
+input[type="range"]{height:15px!important;margin:0!important}
+.btn{
+  padding:6px 9px!important;border-radius:7px!important;
+  font-size:10px!important;font-weight:400!important;letter-spacing:.01em!important;
+  box-shadow:0 5px 14px rgba(60,77,98,.06)!important;
+}
+.btn.small{padding:5px 8px!important;font-size:10px!important;border-radius:6px!important}
+.pill,.tag{
+  padding:3px 7px!important;border-radius:6px!important;
+  font-size:10px!important;font-weight:300!important;
+}
+label{font-size:10px!important;font-weight:300!important}
+.checkLine{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);line-height:1.25}
+.checkGrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;margin-top:3px}
+.kv{
+  grid-template-columns:1fr auto!important;gap:3px 9px!important;
+  font-size:10px!important;line-height:1.35;
+}
+.kv b{font-weight:400!important}
+.statusTags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.note{
+  font-size:9.5px!important;line-height:1.45!important;margin-top:5px!important;
+}
+.tableWrap{
+  max-height:170px;overflow:auto;border:1px solid rgba(255,255,255,.38);
+  border-radius:6px;
+}
+.table{font-size:9px!important;min-width:470px}
+.table th,.table td{padding:3px 3px!important}
+.table th{font-weight:400!important}
+.table input[type=number]{width:54px!important;padding:3px 4px!important;font-size:9px!important;border-radius:4px!important}
+.table input[type=text]{padding:3px 4px!important;font-size:9px!important;border-radius:4px!important}
+.mono{font-size:9px!important}
+.shapeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.shapeGrid .btn{width:100%;padding-left:4px!important;padding-right:4px!important}
+.programBar{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.copyright{padding-bottom:8px!important;font-size:9px!important}
+dialog.appDialog{border-radius:13px!important}
+.dialogHead{padding:10px 12px!important}
+.dialogHead h2{
+  font-family:"Inter","Noto Sans JP",sans-serif!important;
+  font-size:18px!important;font-weight:300!important;
+}
+.dialogBody{padding:12px!important;font-size:11px!important;line-height:1.65!important}
+.dialogBody h3{font-size:13px!important;font-weight:400!important;margin:12px 0 4px!important}
+.closeBtn{border-radius:6px!important;font-size:10px!important;padding:5px 8px!important}
+</style>
 </head>
 <body>
 <header>
@@ -225,84 +366,80 @@ dialog.appDialog::backdrop{background:rgba(20,30,43,.42)!important;backdrop-filt
   </div>
 </header>
 
-<div class="wrap">
+<div class="wrap" id="appWrap">
   <div class="card stage">
     <canvas id="cv" width="900" height="900" aria-label="snowflake canvas"></canvas>
   </div>
 
-  <div class="card side">
-    <div class="row">
-      <button id="btnStart" class="btn">▶ 開始</button>
-      <button id="btnStep" class="btn ghost">＋1ステップ</button>
-      <button id="btnReset" class="btn ghost">↺ リセット</button>
-      <button id="btnSnap" class="btn ghost">📷 PNG保存</button>
-    </div>
 
-    <div class="row">
-      <span class="pill">現在の条件</span>
-      <span class="tag">温度 <b id="tempLabel">−15℃</b></span>
-      <span class="tag">湿度 <b id="supLabel">高</b></span>
-      <span class="tag">モード <b id="modeLabel">樹枝状</b></span>
-    </div>
+  <div class="card side" id="controlPanel">
+    <section class="controlSection">
+      <h2>Controls <span class="jp">操作・条件</span></h2>
+      <div class="compactRow">
+        <button id="btnStart" class="btn">▶ 開始</button>
+        <button id="btnStep" class="btn ghost">＋1</button>
+        <button id="btnReset" class="btn ghost">↺ リセット</button>
+        <button id="btnSnap" class="btn ghost">PNG</button>
+      </div>
 
-    <div>
-      <label>温度（手動）</label>
-      <input id="temp" type="range" min="-35" max="-2" step="1" value="-15">
-    </div>
+      <div class="rangeBlock">
+        <div class="rangeHead"><label for="speed">成長スピード</label><span id="speedLabel" class="rangeValue">1×</span></div>
+        <input id="speed" type="range" min="0" max="7" step="1" value="3">
+      </div>
+      <div class="rangeBlock">
+        <div class="rangeHead"><label for="temp">温度</label><span id="tempValue" class="rangeValue">−15 ℃</span></div>
+        <input id="temp" type="range" min="-35" max="-2" step="1" value="-15">
+      </div>
+      <div class="rangeBlock">
+        <div class="rangeHead"><label for="sup">湿度 / 過飽和度</label><span id="supValue" class="rangeValue">92</span></div>
+        <input id="sup" type="range" min="0" max="100" step="1" value="92">
+      </div>
 
-    <div>
-      <label>湿度/過飽和度（手動）</label>
-      <input id="sup" type="range" min="0" max="100" step="1" value="92">
-    </div>
+      <div class="checkGrid">
+        <label class="checkLine"><input id="useProgram" type="checkbox" checked> 条件プログラム</label>
+        <label class="checkLine"><input id="symLock" type="checkbox"> 6回対称</label>
+        <label class="checkLine"><input id="showVapor" type="checkbox"> 水蒸気場</label>
+      </div>
+    </section>
 
-    <div class="row">
-      <label style="display:flex;gap:8px;align-items:center">
-        <input id="symLock" type="checkbox">
-        6回対称ロック（ONにすると六角形に寄りがち）
-      </label>
-      <label style="display:flex;gap:8px;align-items:center">
-        <input id="showVapor" type="checkbox">
-        水蒸気（背景）を表示
-      </label>
-    </div>
+    <section class="controlSection">
+      <h2>Status <span class="jp">成長中の状態</span></h2>
+      <div class="statusTags">
+        <span class="tag">温度 <b id="tempLabel">−15℃</b></span>
+        <span class="tag">湿度 <b id="supLabel">高</b></span>
+        <span class="tag">形状 <b id="modeLabel">樹枝状</b></span>
+      </div>
+      <div class="kv">
+        <div>ステップ</div><b id="steps">0</b>
+        <div>氷セル数</div><b id="iceCount">0</b>
+        <div>内部状態</div><b id="params" class="mono">—</b>
+      </div>
+    </section>
 
-    <div class="kv">
-      <div>ステップ</div><b id="steps">0</b>
-      <div>氷セル数</div><b id="iceCount">0</b>
-      <div>内部パラメータ</div><b id="params" class="mono">—</b>
-    </div>
-
-    <div class="row">
-      <span class="pill">中谷ダイアグラム風プリセット</span>
-      <button class="btn ghost small" data-nakaya="plate">板状</button><button class="btn ghost small" data-nakaya="column">柱状 / 針状</button><button class="btn ghost small" data-nakaya="fan">扇六花</button><button class="btn ghost small" data-nakaya="dendrite">樹枝状</button>
-    </div>
-
-    <div class="row">
-      <span class="pill">条件切替プログラム</span>
-      <label style="display:flex;gap:8px;align-items:center">
-        <input id="useProgram" type="checkbox" checked>
-        プログラムを使用（ONで途中切替）
-      </label>
-    </div>
-
-    <div class="row">
-      <button id="btnAddStage" class="btn ghost small">＋ステージ追加</button>
-      <button id="btnClearStages" class="btn ghost small">🧹 クリア</button>
-      <button id="btnFan" class="btn ghost small">🪭 扇六花モード</button>
-      <button id="btnNakayaTour" class="btn ghost small">🗺 温度帯ツアー</button>
-    </div>
-
-    <div class="note"><b>物理モデル：</b> 水蒸気の拡散場 σ、境界質量 m、付着係数 α を用いる六角格子セルオートマトンです。温度で基底面・柱面の成長速度比を変え、過飽和度で拡散不安定性を調整します。数式と参考文献は右上のヘルプに掲載しています。</div><div style="border:1px solid rgba(255,255,255,.45);border-radius:12px;overflow:hidden">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>#</th><th>継続(steps)</th><th>温度</th><th>湿度</th><th>狙い</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="stageBody"></tbody>
-      </table>
-    </div>
+    <section class="controlSection">
+      <h2>Target Habit <span class="jp">目標とする形状</span></h2>
+      <div class="shapeGrid">
+        <button class="btn ghost small" data-nakaya="plate">板状</button>
+        <button class="btn ghost small" data-nakaya="column">柱状</button>
+        <button class="btn ghost small" data-nakaya="fan">扇六花</button>
+        <button class="btn ghost small" data-nakaya="dendrite">樹枝状</button>
+      </div>
+      <div class="programBar">
+        <button id="btnFan" class="btn ghost small">扇六花プログラム</button>
+        <button id="btnNakayaTour" class="btn ghost small">温度帯ツアー</button>
+        <button id="btnAddStage" class="btn ghost small">＋条件</button>
+        <button id="btnClearStages" class="btn ghost small">クリア</button>
+      </div>
+      <div class="tableWrap" style="margin-top:5px">
+        <table class="table">
+          <thead><tr><th>#</th><th>steps</th><th>温度</th><th>湿度</th><th>狙い</th><th></th></tr></thead>
+          <tbody id="stageBody"></tbody>
+        </table>
+      </div>
+      <div class="note">温度に応じた基底面 / 柱面の付着係数と、過飽和度による拡散不安定性から代表形状を切り替えます。数式は右上のヘルプに掲載しています。</div>
+    </section>
   </div>
+  <button id="panelToggle" class="panelToggle" type="button" aria-label="操作パネルを閉じる" title="操作パネルを開閉">›</button>
 </div>
 
 <footer class="copyright">© Science Comunication Design Laboratory, Kagawa University</footer>
@@ -327,7 +464,7 @@ dialog.appDialog::backdrop{background:rgba(20,30,43,.42)!important;backdrop-filt
   <div class="dialogBody">
     <h3>このアプリでできること</h3>
     <ul>
-      <li>温度と過飽和度を変え、板状・柱状 / 針状・扇六花・樹枝状の成長を比較できます。</li>
+      <li>温度と過飽和度を変え、板状・柱状 / 針状・扇六花・樹枝状の成長を比較できます。</li><li>「成長スピード」スライダーで、計算・描画の進行速度を0.25×〜4×の範囲で変更できます。</li>
       <li>「プログラムを使用」をONにすると、結晶が成長する途中で温度・過飽和度を順番に切り替えられます。</li>
       <li>「水蒸気（背景）を表示」で、結晶周囲の無次元過飽和度 σ の分布を確認できます。</li>
       <li>柱状モードでは c 軸方向の成長量を別状態として計算し、2D格子に奥行きを加えた擬似3D表示を行います。</li>
@@ -385,7 +522,10 @@ const ui={
  btnNakayaTour:document.getElementById('btnNakayaTour'),stageBody:document.getElementById('stageBody'),
  btnQR:document.getElementById('btnQR'),btnHelp:document.getElementById('btnHelp'),
  qrDialog:document.getElementById('qrDialog'),helpDialog:document.getElementById('helpDialog'),
- qrClose:document.getElementById('qrClose'),helpClose:document.getElementById('helpClose')
+ qrClose:document.getElementById('qrClose'),helpClose:document.getElementById('helpClose'),
+ speed:document.getElementById('speed'),speedLabel:document.getElementById('speedLabel'),
+ tempValue:document.getElementById('tempValue'),supValue:document.getElementById('supValue'),
+ panelToggle:document.getElementById('panelToggle'),appWrap:document.getElementById('appWrap')
 };
 
 document.documentElement.style.setProperty('--snow-bg',"url('assets/snow-bg.jpg')");
@@ -394,6 +534,8 @@ const W=cv.width,H=cv.height,R=70;
 const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
 const key=(q,r)=>q+','+r, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let ice=new Set(),vapor=new Map(),mass=new Map(),stepCount=0,running=false,rafId=null,crystalHeight=0;
+const SPEEDS=[0.25,0.5,0.75,1,1.5,2,3,4];
+let lastFrameTime=0,stepAccumulator=0;
 
 let stages=[
  {steps:300,tC:-15,sup:94,label:'樹枝状：主枝と側枝'},
@@ -552,7 +694,7 @@ function drawHex(x,y,s){
 function draw(){
  ctx.clearRect(0,0,W,H);const s=Math.min(W,H)/(R*2.34),cx=W/2,cy=H/2;
  const st=stageAt(stepCount),P=params(st.tC,st.sup);
- ctx.fillStyle='rgba(248,251,253,.12)';ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='rgba(19,30,40,.26)';ctx.fillRect(0,0,W,H);
  if(ui.showVapor.checked){
   for(let q=-R;q<=R;q++)for(let r=-R;r<=R;r++){
    if(!inHex(q,r)||isIce(q,r))continue;
@@ -594,6 +736,8 @@ function renderStages(){
 function updateUI(){
  const T=+ui.temp.value,S=+ui.sup.value,P=params(stageAt(stepCount).tC,stageAt(stepCount).sup);
  ui.tempLabel.textContent=T+'℃';ui.supLabel.textContent=S<34?'低':S<67?'中':'高';
+ ui.tempValue.textContent=T+' ℃';ui.supValue.textContent=String(S);
+ const sf=SPEEDS[+ui.speed.value]||1;ui.speedLabel.textContent=sf+'×';
  ui.modeLabel.textContent={plate:'板状',column:'柱状 / 針状',fan:'扇六花',dendrite:'樹枝状'}[P.habit];
  ui.steps.textContent=String(stepCount);ui.iceCount.textContent=String(ice.size);
  ui.params.textContent='D='+P.D.toFixed(2)+' αprism='+P.alphaP.toFixed(2)+' αbasal='+P.alphaB.toFixed(2)+' A6='+P.eps6.toFixed(2)+' h='+crystalHeight.toFixed(1);
@@ -603,7 +747,16 @@ function reset(){
  for(let q=-R;q<=R;q++)for(let r=-R;r<=R;r++)if(inHex(q,r))vapor.set(key(q,r),dist01(q,r)>.89?1:.025);
  setIce(0,0,true);setIce(1,0,true);draw();updateUI();
 }
-function loop(){if(!running)return;for(let i=0;i<3;i++)step();draw();updateUI();rafId=requestAnimationFrame(loop)}
+function loop(ts){
+ if(!running)return;
+ if(!lastFrameTime)lastFrameTime=ts;
+ const dt=Math.min(.12,(ts-lastFrameTime)/1000);lastFrameTime=ts;
+ const sf=SPEEDS[+ui.speed.value]||1;
+ stepAccumulator+=dt*36*sf;
+ let n=Math.min(16,Math.floor(stepAccumulator));
+ if(n>0){stepAccumulator-=n;for(let i=0;i<n;i++)step();draw();updateUI()}
+ rafId=requestAnimationFrame(loop)
+}
 function preset(kind){
  ui.useProgram.checked=false;
  const p={plate:[-15,36],column:[-5,56],fan:[-15,63],dendrite:[-15,94]}[kind];
@@ -611,11 +764,25 @@ function preset(kind){
 }
 
 ui.symLock.checked=true;
-ui.btnStart.onclick=()=>{running=!running;ui.btnStart.textContent=running?'⏸ 停止':'▶ 開始';if(running)loop();else if(rafId)cancelAnimationFrame(rafId)};
+ui.btnStart.onclick=()=>{
+ running=!running;ui.btnStart.textContent=running?'⏸ 停止':'▶ 開始';
+ if(running){lastFrameTime=0;stepAccumulator=0;rafId=requestAnimationFrame(loop)}
+ else if(rafId)cancelAnimationFrame(rafId)
+};
 ui.btnStep.onclick=()=>{if(!running){step();draw();updateUI()}};
 ui.btnReset.onclick=()=>{running=false;ui.btnStart.textContent='▶ 開始';if(rafId)cancelAnimationFrame(rafId);reset()};
 ui.btnSnap.onclick=()=>{const a=document.createElement('a');a.download='snowflake_step'+stepCount+'.png';a.href=cv.toDataURL('image/png');a.click()};
-ui.temp.oninput=updateUI;ui.sup.oninput=updateUI;ui.showVapor.onchange=draw;
+ui.temp.oninput=updateUI;ui.sup.oninput=updateUI;ui.speed.oninput=updateUI;ui.showVapor.onchange=draw;
+ui.panelToggle.onclick=()=>{
+ const collapsed=ui.appWrap.classList.toggle('panel-collapsed');
+ ui.panelToggle.textContent=collapsed?'‹':'›';
+ ui.panelToggle.setAttribute('aria-label',collapsed?'操作パネルを開く':'操作パネルを閉じる');
+ localStorage.setItem('snowflake-panel-collapsed',collapsed?'1':'0');
+};
+if(localStorage.getItem('snowflake-panel-collapsed')==='1'){
+ ui.appWrap.classList.add('panel-collapsed');ui.panelToggle.textContent='‹';
+ ui.panelToggle.setAttribute('aria-label','操作パネルを開く');
+}
 ui.btnAddStage.onclick=()=>{stages.push({steps:200,tC:-15,sup:70,label:'追加ステージ'});renderStages()};
 ui.btnClearStages.onclick=()=>{stages=[];renderStages();updateUI()};
 ui.btnFan.onclick=()=>{stages=[{steps:240,tC:-15,sup:65,label:'扇の主枝'},{steps:240,tC:-13,sup:56,label:'面を広げる'},{steps:180,tC:-15,sup:68,label:'先端を整える'}];ui.useProgram.checked=true;renderStages();reset()};
