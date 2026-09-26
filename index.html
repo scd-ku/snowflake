@@ -388,9 +388,7 @@ const ui={
  qrClose:document.getElementById('qrClose'),helpClose:document.getElementById('helpClose')
 };
 
-Promise.all([0,1,2,3,4].map(i=>fetch('assets/bg'+i+'.txt').then(r=>r.text())))
- .then(parts=>document.documentElement.style.setProperty('--snow-bg','url("data:image/jpeg;base64,'+parts.join('')+'")'))
- .catch(()=>{});
+document.documentElement.style.setProperty('--snow-bg',"url('assets/snow-bg.jpg')");
 
 const W=cv.width,H=cv.height,R=70;
 const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
